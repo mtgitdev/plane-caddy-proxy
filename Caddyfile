@@ -42,6 +42,12 @@
 		}
 	}
 
+	handle /uploads/* {
+    reverse_proxy {$API_ENDPOINT} {
+        header_up Host {upstream_hostport}
+    	}
+	}
+
 	handle /spaces/* {
 		reverse_proxy {$SPACES_ENDPOINT} {
 			header_up Host {upstream_hostport}
