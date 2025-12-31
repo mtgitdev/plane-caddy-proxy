@@ -1,64 +1,86 @@
 # global options
 {
-	admin off # theres no need for the admin api in railway's environment
-	persist_config off # storage isn't persistent anyway
-	auto_https off # railway handles https for us, this could in some cases cause issues if left enabled
-	# runtime logs
+	admin off
+	persist_config off
+	auto_https off
 	log {
-		format json # set runtime log format to json mode 
+		format json
 	}
-	# server options
 	servers {
-		trusted_proxies static private_ranges 100.0.0.0/8 # trust railway's proxy
+		trusted_proxies static private_ranges 100.0.0.0/8
 	}
 }
 
-# site block, listens on the $PORT environment variable, automatically assigned by railway
 :{$PORT} {
-	# access logs
 	log {
-		format json # set access log format to json mode
+		format json
 	}
-
+	
 	reverse_proxy /* {$WEB_ENDPOINT} {
-		header_up Host {upstream_hostport}
+		header_up Host plane.karrycar.com
+		header_up X-Forwarded-Proto https
+		header_up X-Forwarded-Host plane.karrycar.com
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Real-IP {remote_host}
 	}
-
+	
 	handle /god-mode/* {
 		reverse_proxy {$ADMIN_ENDPOINT} {
-			header_up Host {upstream_hostport}
+			header_up Host plane.karrycar.com
+			header_up X-Forwarded-Proto https
+			header_up X-Forwarded-Host plane.karrycar.com
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Real-IP {remote_host}
 		}
 	}
-
+	
 	handle /api/* {
 		reverse_proxy {$API_ENDPOINT} {
 			header_up Host plane.karrycar.com
-        	header_up X-Forwarded-Host plane.karrycar.com
-        	header_up X-Forwarded-Proto https
+			header_up X-Forwarded-Proto https
+			header_up X-Forwarded-Host plane.karrycar.com
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Real-IP {remote_host}
 		}
 	}
-
+	
 	handle /auth/* {
 		reverse_proxy {$API_ENDPOINT} {
-			header_up Host {upstream_hostport}
+			header_up Host plane.karrycar.com
+			header_up X-Forwarded-Proto https
+			header_up X-Forwarded-Host plane.karrycar.com
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Real-IP {remote_host}
 		}
 	}
-
+	
 	handle /uploads/* {
-    reverse_proxy {$API_ENDPOINT} {
-        header_up Host {upstream_hostport}
-    	}
+		reverse_proxy {$API_ENDPOINT} {
+			header_up Host plane.karrycar.com
+			header_up X-Forwarded-Proto https
+			header_up X-Forwarded-Host plane.karrycar.com
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Real-IP {remote_host}
+		}
 	}
-
+	
 	handle /spaces/* {
 		reverse_proxy {$SPACES_ENDPOINT} {
-			header_up Host {upstream_hostport}
+			header_up Host plane.karrycar.com
+			header_up X-Forwarded-Proto https
+			header_up X-Forwarded-Host plane.karrycar.com
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Real-IP {remote_host}
 		}
 	}
-
+	
 	handle /{$BUCKET_NAME}/* {
 		reverse_proxy {$BUCKET_ENDPOINT} {
-			header_up Host {upstream_hostport}
+			header_up Host plane.karrycar.com
+			header_up X-Forwarded-Proto https
+			header_up X-Forwarded-Host plane.karrycar.com
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Real-IP {remote_host}
 		}
 	}
 }
