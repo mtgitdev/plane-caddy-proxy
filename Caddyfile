@@ -32,7 +32,9 @@
 
 	handle /api/* {
 		reverse_proxy {$API_ENDPOINT} {
-			header_up Host {upstream_hostport}
+			header_up Host plane.karrycar.com
+        	header_up X-Forwarded-Host plane.karrycar.com
+        	header_up X-Forwarded-Proto https
 		}
 	}
 
